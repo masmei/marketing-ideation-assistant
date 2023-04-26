@@ -39,19 +39,12 @@ export default function Home() {
           new Error(`Request failed with status ${response.status}`)
         );
       }
-
-      setResult(
-        Object.entries(data.result).map(([key, value]) => (
-          <div key={key}>
-            <h2>{key}</h2>
-            <p>{value}</p>
-          </div>
-        ))  
-      );           
+      console.log(data.result);
+      setResult(data.result.split("\n\n"));
       setLoading(false);
     } catch (error) {
       console.error(error);
-      setError(true);
+      setError(error);
     }
   }
 
@@ -65,7 +58,6 @@ export default function Home() {
       <main className={styles.main}>
         <h3>Marketing Ideation Assistant</h3>
         <form onSubmit={sendRequest}>
-  
           <label htmlFor="companyName">Company Name:</label>
           <input
             id="companyName"
@@ -75,7 +67,6 @@ export default function Home() {
             placeholder=""
             required
           />
-          
           <label htmlFor="companyDescription">Company Description:</label>
           <input
             id="companyDescription"
@@ -114,7 +105,18 @@ export default function Home() {
             <Error />
           </div>
         ) : (
-          <div className={styles.result}>{loading ? <Loading /> : result}</div>
+          <div className={styles.result}>
+            {loading ? (
+              <Loading />
+            ) : (
+              result &&
+              result.map((campaign, index) => (
+                <div className={styles.campaign} key={index}>
+                  <pre>{campaign}</pre>
+                </div>
+              ))
+            )}
+          </div>
         )}
       </main>
     </div>
