@@ -1,10 +1,10 @@
 import { Configuration, OpenAIApi } from "openai";
 
+console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
+
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-console.log("API key:", configuration.apiKey);
 
 const openai = new OpenAIApi(configuration);
 
@@ -30,12 +30,10 @@ export default async function (req, res) {
       top_p: 1.0,
       frequency_penalty: 0.0,
       presence_penalty: 0.0,
-      format: "text"
+      format: "text",
     });
 
     const result = completion.data.choices[0].text.trim();
-
-    console.log(completion.data.choices)
 
     res.status(200).json({ result });
   } catch (error) {

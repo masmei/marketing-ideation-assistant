@@ -93,17 +93,15 @@
 }
 
 .main .result > div {
-  margin: 8px;
   background-color: #F9F9F9;
-  /* border-radius: 4px; */
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 2px;
   width: 100%;
 }
 
 .main .result pre {
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 15px;
+  line-height: 20px;
   white-space: inherit;;
   color: #666;
 }
