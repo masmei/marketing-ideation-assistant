@@ -1,6 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 
-console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
+console.log("OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -19,23 +19,28 @@ export default async function (req, res) {
     return;
   }
 
-  const input = req.body.input || "";
+  const { companyName, companyDescription, productDescription, targetAudience } = req.body;
+
+  if (!companyName || !companyDescription || !productDescription || !targetAudience) {
+    res.status(400).json({
+      error: {
+        message: "Please provide all required information",
+      }
+    });
+    return;
+  }
 
   try {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: generatePrompt(input),
+      prompt: generatePrompt(companyName, companyDescription, productDescription, targetAudience),
       temperature: 1,
-      max_tokens: 1200,
-      top_p: 1.0,
-      frequency_penalty: 0.0,
-      presence_penalty: 0.0,
-      format: "text",
+      max_tokens: 1500,
     });
 
-    const result = completion.data.choices[0].text.trim();
+    // const result = completion.data.choices[0].text.trim();
 
-    res.status(200).json({ result });
+    res.status(200).json({ result: completion.data.choices[0].text });
   } catch (error) {
     if (error.response) {
       console.error(error.response.status, error.response.data);
@@ -51,13 +56,11 @@ export default async function (req, res) {
   }
 }
 
-function generatePrompt(input) {
-  return `Brainstorm 6 original marketing campaign ideas for ${input.companyName}, an ${input.companyDescription}. Let your imagination run wild. Provide as much detail as possible and a creative brief.
+function generatePrompt(companyName, companyDescription, productDescription, targetAudience) {
+  return `Brainstorm 6 original marketing campaign ideas for ${companyName}, an ${companyDescription}. Let your imagination run wild. Provide as much detail as possible and a creative brief.
 
-  PRODUCT DESCRIPTION: ${input.productDescription}.
+  PRODUCT DESCRIPTION: ${productDescription}.
   
-  TARGET AUDIENCE: ${input.audienceDescription}.
+  TARGET AUDIENCE: ${targetAudience}.
  `;
 }
-
-

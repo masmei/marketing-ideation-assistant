@@ -1,15 +1,13 @@
 import Head from "next/head";
 import { useState } from "react";
 import styles from "./index.module.css";
-import Loading from "../components/Loading";
-import Error from "../components/Error";
 
 export default function Home() {
   const [userInput, setuserInput] = useState({
     companyDescription: "",
     companyName: "",
     productDescription: "",
-    audienceDescription: "",
+    targetAudience: "",
   });
   const [result, setResult] = useState();
   const [loading, setLoading] = useState(false);
@@ -22,14 +20,14 @@ export default function Home() {
   async function sendRequest(event) {
     event.preventDefault();
     try {
-      setError("");
+      setError(false);
       setLoading(true);
       const response = await fetch(`/api/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ input: userInput }),
+        body: JSON.stringify(userInput),
       });
 
       const data = await response.json();
@@ -39,12 +37,11 @@ export default function Home() {
           new Error(`Request failed with status ${response.status}`)
         );
       }
-      console.log(data.result);
       setResult(data.result.split("\n\n"));
       setLoading(false);
     } catch (error) {
       console.error(error);
-      setError(error);
+      setError(true);
     }
   }
 
@@ -87,12 +84,12 @@ export default function Home() {
             placeholder=""
             required
           />
-          <label htmlFor="audienceDescription">Audience Description:</label>
+          <label htmlFor="targetAudience">Target Audience:</label>
           <textarea
-            id="audienceDescription"
+            id="targetAudience"
             rows={3}
             cols={50}
-            value={userInput.audienceDescription}
+            value={userInput.targetAudience}
             type="textarea"
             onChange={handleTextChange}
             placeholder=""
@@ -100,26 +97,23 @@ export default function Home() {
           />
           <input type="submit" value="Generate" />
         </form>
-        {error ? (
-          <div className={styles.error}>
-            <Error />
-          </div>
-        ) : (
-          <div className={styles.result}>
-            {loading ? (
-              <Loading />
-            ) : (
-              result &&
-              result.map((campaign, index) => (
-                <div className={styles.campaign} key={index}>
-                  <pre>{campaign}</pre>
-                </div>
-              ))
-            )}
-          </div>
-        )}
+        <div className={styles.result}>
+          {loading && <p>Loading...</p>}
+          {error && (
+            <p className={styles.error}>
+              An error occurred during your request. Please try again.
+            </p>
+          )}
+          {!loading &&
+            !error &&
+            result &&
+            result.map((campaign, index) => (
+              <div className={styles.campaign} key={index}>
+                <pre>{campaign}</pre>
+              </div>
+            ))}
+        </div>
       </main>
     </div>
   );
 }
-
